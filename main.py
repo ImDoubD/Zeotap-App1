@@ -92,18 +92,29 @@ def combine_rules(
 
 # eveluate new rule
 @app.post("/evaluate_rule/")
-def evaluate_rule(
-    request: EvaluateRuleRequest,
-    db: Session = Depends(get_db)
-):
+def evaluate_rule(request: EvaluateRuleRequest, db: Session = Depends(get_db)):
     try:
         rule = db.query(Rule).filter(Rule.id == request.rule_id).first()
         if not rule:
             raise HTTPException(status_code=404, detail="Rule not found")
 
+        # Ensure age, salary, and experience are integers
+        for field in ["age", "salary", "experience"]:
+            if field in request.user_data:
+                try:
+                    request.user_data[field] = int(request.user_data[field])
+                except ValueError:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"Invalid type for {field}; it must be an integer."
+                    )
+
+        # Convert AST from JSON and evaluate the rule
         ast = dict_to_node(rule.ast_json)
         result = evaluateRule(ast, request.user_data)
+        
         return {"result": result}
+        
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
