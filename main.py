@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
+from sqlalchemy import asc
 from sqlalchemy.orm import Session
 from models import Rule
 from database import get_db
@@ -107,7 +108,19 @@ def evaluate_rule(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
-    
+
+# fetch all rules
+@app.get("/fetch-rules")
+def fetch_rules(db: Session = Depends(get_db)):
+    try:
+        rules = db.query(Rule.id, Rule.rule_string).order_by(asc(Rule.id)).all()
+        rule_list = [{"id": rule.id, "rule_string": rule.rule_string} for rule in rules]
+        
+        return {"rules": rule_list}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+       
+
 @app.put("/modify_rule/")
 def modify_rule(
     rule_id: int = Query(...),
