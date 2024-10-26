@@ -137,4 +137,4 @@ def modify_rule(
 
 @app.get("/")
 def root():
-    return {"message": "Weather Monitoring API is running!"}
+    return {"message": "AST rule engine is running!"}
