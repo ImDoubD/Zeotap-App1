@@ -1,0 +1,9 @@
+psycopg2-binary
+pydantic 
+python-dotenv
+sqlalchemy
+fastapi 
+uvicorn[standard]  
+databases[postgresql]
+httpx
+python-dateutil
