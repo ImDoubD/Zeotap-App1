@@ -134,3 +134,7 @@ def modify_rule(
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/")
+def root():
+    return {"message": "Weather Monitoring API is running!"}
